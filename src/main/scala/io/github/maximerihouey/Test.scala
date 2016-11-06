@@ -54,7 +54,7 @@ object Test {
 
 //    DfTest.show()
 
-    val fitted_model = new org.apache.spark.ml.classification.LogisticRegression().fit(DfTrain)
+    val fitted_model = new LogisticRegression().fit(DfTrain)
     val predictions = fitted_model.transform(DfTest)
 
     predictions.show()
