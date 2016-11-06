@@ -2,12 +2,12 @@
 
 The code is written in Scala 2.11 (2.11.8) and SBT 0.13 (0.13.8).
 
-We need first to compile the source code
+To compile the source code
 <pre>
-quickselect-playground/scala$ <b>sbt compile</b>
+sbt clean package
 </pre>
 
-Then to execute the benchmark,
+To execute the test script,
 <pre>
-quickselect-playground/scala$ <b>sbt run</b>
+$SPARK_HOME/bin/spark-submit --class "io.github.maximerihouey.Test" target/scala-2.11/logistic_regression_scala_2.11-1.0.jar 
 </pre>
