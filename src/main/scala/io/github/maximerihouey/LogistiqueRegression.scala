@@ -7,6 +7,7 @@ class LogistiqueRegression {
 
   var fitted: Boolean = false
   var coefficients: Array[Double] = null
+  var intercept: Double = 0.0;
 
   def fit(features: Array[Array[Double]], labels: Array[Integer]){
     coefficients = Array.ofDim[Double](features(0).length);
@@ -14,7 +15,15 @@ class LogistiqueRegression {
   }
 
   def predict(features: Array[Double]): Integer = {
-    return 0;
+    var prediction = intercept
+    for(i <- 0 to features.length-1){
+      prediction += coefficients(i) * features(i)
+    }
+    if(prediction > 0){
+      return 1;
+    }else{
+      return 0;
+    }
   }
 
   def predict(features: Array[Array[Double]]): Array[Integer] = {

@@ -64,9 +64,7 @@ object Test {
     ).select(sum("value")).first().get(0)
 
     val nbAccurateDouble : Double = nbAccurate.asInstanceOf[Double]
-    println("\n")
-    println("Accuracy: %f | Count: %d".format(nbAccurateDouble / predictions.count(), predictions.count()))
-    println("\n")
+    println("\nAccuracy: %f | Count: %d\n".format(nbAccurateDouble / predictions.count(), predictions.count()))
 
     // Logistique regression
     val y_data_int = class_0_labels_int ++ class_1_labels_int
@@ -75,8 +73,6 @@ object Test {
     logit.fit(X_data, y_data_int)
     val predictions2 = logit.predict(X_data)
     val accuracy2 = (y_data_int zip predictions2).map(row => if(row._1 == row._2) 1.0 else 0.0).sum / predictions2.length
-    println("\n")
-    println("Accuracy: %f | Count: %d".format(accuracy2, predictions2.length))
-    println("\n")
+    println("\nAccuracy: %f | Count: %d\n".format(accuracy2, predictions2.length))
   }
 }
