@@ -11,27 +11,36 @@ class LogistiqueRegression {
   var featuresMultiple: Array[Array[Double]] = null
   var labels: Array[Integer] = null
   var labelsDouble: Array[Double] = null
+  var alpha = 0.0001
 
   def fit(featuresMultiple: Array[Array[Double]], labels: Array[Integer]){
     this.featuresMultiple = featuresMultiple
     this.labels = labels
-    for(i <- 0 to labels.length){
-      labelsDouble(i) = labels(i).toDouble
+    this.labelsDouble = Array.ofDim[Double](labels.length)
+    for(i <- 0 to this.labels.length-1){
+      //println(">>> %d".format(i))
+      labelsDouble(i) = this.labels(i).toDouble
     }
     this.coefficients = Array.ofDim[Double](featuresMultiple(0).length)
 
-    for(k <- 0 to 10){
-      val current_gradient = gradient()
-      updateCoefficients(current_gradient)
-      println("%d | %f".format(k, logLikelihood()))
+    println("---------------------- %d | %f".format(0, logLikelihood()))
+    for(k <- 0 to 5){
+      updateCoefficients()
+      println(">>>> Coeficients %d".format(k+1))
+      for(i <- 0 to this.coefficients.length-1){
+        println("%f".format(this.coefficients(i)))
+      }
+      println("---------------------- %d | %f".format(k+1, logLikelihood()))
     }
     fitted = true
   }
 
   def predict(featuresMultiple: Array[Array[Double]]): Array[Integer] = {
+    println("PREDICTIONS PREDICTIONS PREDICTIONS")
     val predictions = Array.ofDim[Integer](featuresMultiple.length)
     for(i <- 0 to (featuresMultiple.length-1)){
       predictions(i) = this.predict(featuresMultiple(i))
+      println("Prediction: %d | %d | %f".format(predictions(i), this.labels(i), posterior(featuresMultiple(i))))
     }
     return predictions
   }
@@ -39,7 +48,7 @@ class LogistiqueRegression {
   def predict(features: Array[Double]): Integer = {
     val probability = posterior(features)
 
-    if(probability > 0){
+    if(probability > 0.5){
       return 1
     }else{
       return 0
@@ -48,8 +57,8 @@ class LogistiqueRegression {
 
   def logLikelihood(): Double = {
     var logLikelihoodVal: Double = 0.0
-    for(i <- 0 to this.featuresMultiple.length){
-      if (this.labels(i) == 1){
+    for(i <- 0 to this.featuresMultiple.length-1){
+      if (this.labels(i) == 0){
         logLikelihoodVal += Math.log(1 - posterior(this.featuresMultiple(i)))
       }else{
         logLikelihoodVal += Math.log(posterior(this.featuresMultiple(i)))
@@ -64,8 +73,8 @@ class LogistiqueRegression {
     for(i <- 0 to features.length-1){
       probability += coefficients(i) * features(i)
     }
-
-    return probability
+    // Sigmoid of the regression
+    return 1.0 / (1.0 + Math.exp(-probability))
   }
 
   def gradient(): Array[Double] = {
@@ -80,9 +89,16 @@ class LogistiqueRegression {
     return gradient
   }
 
-  def updateCoefficients(gradient: Array[Double]) = {
-    for(i <- 0 to this.coefficients.length){
-      this.coefficients(i) -= gradient(i)
+  def updateCoefficients() = {
+    val current_gradient = gradient()
+    /*
+    println(">>>> Gradient %d".format(k+1))
+    for(i <- 0 to current_gradient.length-1){
+      println("%f".format(current_gradient(i)))
+    }
+    */
+    for(i <- 0 to this.coefficients.length-1){
+      this.coefficients(i) -= current_gradient(i) * this.alpha
     }
   }
 }
