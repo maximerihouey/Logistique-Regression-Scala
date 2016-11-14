@@ -8,10 +8,19 @@ import org.apache.spark.sql._
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.linalg.{Vector, Vectors}
 
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
 /**
   * Created by maxime on 04/11/16.
   */
 object Test {
+
+  //////////////////////////////////////////////////////
+  Logger.getLogger("org").setLevel(Level.OFF)
+  Logger.getLogger("akka").setLevel(Level.OFF)
+  println("\n\n\n\n\n")
+  //////////////////////////////////////////////////////
 
   def buildGaussianDataset(size: Integer, nDims: Integer, mean: Double): Array[Array[Double]] ={
     val array = Array.ofDim[Double](size, nDims);
