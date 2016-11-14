@@ -11,7 +11,7 @@ class LogistiqueRegression {
   var featuresMultiple: Array[Array[Double]] = null
   var labels: Array[Integer] = null
   var labelsDouble: Array[Double] = null
-  var alpha = 0.0001
+  var alpha = 0.00001
 
   def fit(featuresMultiple: Array[Array[Double]], labels: Array[Integer]){
     this.featuresMultiple = featuresMultiple
@@ -24,7 +24,7 @@ class LogistiqueRegression {
     this.coefficients = Array.ofDim[Double](featuresMultiple(0).length)
 
     println("---------------------- %d | %f".format(0, logLikelihood()))
-    for(k <- 0 to 5){
+    for(k <- 0 to 25){
       updateCoefficients()
       println(">>>> Coeficients %d".format(k+1))
       for(i <- 0 to this.coefficients.length-1){
@@ -36,11 +36,11 @@ class LogistiqueRegression {
   }
 
   def predict(featuresMultiple: Array[Array[Double]]): Array[Integer] = {
-    println("PREDICTIONS PREDICTIONS PREDICTIONS")
     val predictions = Array.ofDim[Integer](featuresMultiple.length)
+    //println("PREDICTIONS PREDICTIONS PREDICTIONS")
     for(i <- 0 to (featuresMultiple.length-1)){
       predictions(i) = this.predict(featuresMultiple(i))
-      println("Prediction: %d | %d | %f".format(predictions(i), this.labels(i), posterior(featuresMultiple(i))))
+      //println("Prediction: %d | %d | %f".format(predictions(i), this.labels(i), posterior(featuresMultiple(i))))
     }
     return predictions
   }
@@ -48,7 +48,7 @@ class LogistiqueRegression {
   def predict(features: Array[Double]): Integer = {
     val probability = posterior(features)
 
-    if(probability > 0.5){
+    if(probability <= 0.5){
       return 1
     }else{
       return 0
@@ -58,7 +58,7 @@ class LogistiqueRegression {
   def logLikelihood(): Double = {
     var logLikelihoodVal: Double = 0.0
     for(i <- 0 to this.featuresMultiple.length-1){
-      if (this.labels(i) == 0){
+      if (this.labels(i) == 1){
         logLikelihoodVal += Math.log(1 - posterior(this.featuresMultiple(i)))
       }else{
         logLikelihoodVal += Math.log(posterior(this.featuresMultiple(i)))
