@@ -23,14 +23,29 @@ class LogistiqueRegression {
     }
     this.coefficients = Array.ofDim[Double](featuresMultiple(0).length)
 
-    println("---------------------- %d | %f".format(0, logLikelihood()))
-    for(k <- 0 to 25){
+    var k: Integer = 0
+    val kMax: Integer = 250
+    var epsilon: Double = 1.0
+    val epsilonMin: Double = 1.0
+    var logLikelihoodPreviousVal: Double = 0.0
+    var logLikelihoodVal = logLikelihood()
+    println("---------------------- %d | %f".format(0, logLikelihoodVal))
+
+    while((k < kMax) && (Math.abs(logLikelihoodVal - logLikelihoodPreviousVal) > epsilonMin)){
       updateCoefficients()
+      k += 1
+
+      logLikelihoodPreviousVal = logLikelihoodVal
+      logLikelihoodVal = logLikelihood()
+      println("---------------------- %d | %f".format(k, logLikelihoodVal))
+      /*
       println(">>>> Coeficients %d".format(k+1))
       for(i <- 0 to this.coefficients.length-1){
         println("%f".format(this.coefficients(i)))
       }
-      println("---------------------- %d | %f".format(k+1, logLikelihood()))
+      */
+
+
     }
     fitted = true
   }
