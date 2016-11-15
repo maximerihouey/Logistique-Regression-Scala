@@ -11,51 +11,40 @@ class LogistiqueRegression {
   var featuresMultiple: Array[Array[Double]] = null
   var labels: Array[Integer] = null
   var labelsDouble: Array[Double] = null
-  var alpha = 0.00001
+  var alpha = 0.000005
 
   def fit(featuresMultiple: Array[Array[Double]], labels: Array[Integer]){
     this.featuresMultiple = featuresMultiple
     this.labels = labels
     this.labelsDouble = Array.ofDim[Double](labels.length)
     for(i <- 0 to this.labels.length-1){
-      //println(">>> %d".format(i))
       labelsDouble(i) = this.labels(i).toDouble
     }
     this.coefficients = Array.ofDim[Double](featuresMultiple(0).length)
 
     var k: Integer = 0
-    val kMax: Integer = 250
-    var epsilon: Double = 1.0
-    val epsilonMin: Double = 1.0
-    var logLikelihoodPreviousVal: Double = 0.0
-    var logLikelihoodVal = logLikelihood()
-    println("---------------------- %d | %f".format(0, logLikelihoodVal))
+    val kMax: Integer = 500
+    val epsilonMin: Double = 0.001
+    var logLikelihoodVal: Double = logLikelihood()
+    var logLikelihoodPreviousVal: Double = logLikelihoodVal - 1.0
+    //println("---------------------- %d | %f".format(0, logLikelihoodVal))
 
-    while((k < kMax) && (Math.abs(logLikelihoodVal - logLikelihoodPreviousVal) > epsilonMin)){
+    while((k < kMax) && (Math.abs(logLikelihoodVal - logLikelihoodPreviousVal) > epsilonMin) && (logLikelihoodVal > logLikelihoodPreviousVal)){
       updateCoefficients()
       k += 1
 
       logLikelihoodPreviousVal = logLikelihoodVal
       logLikelihoodVal = logLikelihood()
-      println("---------------------- %d | %f".format(k, logLikelihoodVal))
-      /*
-      println(">>>> Coeficients %d".format(k+1))
-      for(i <- 0 to this.coefficients.length-1){
-        println("%f".format(this.coefficients(i)))
-      }
-      */
-
-
+      //println("---------------------- %d | %f".format(k, logLikelihoodVal))
     }
+
     fitted = true
   }
 
   def predict(featuresMultiple: Array[Array[Double]]): Array[Integer] = {
     val predictions = Array.ofDim[Integer](featuresMultiple.length)
-    //println("PREDICTIONS PREDICTIONS PREDICTIONS")
     for(i <- 0 to (featuresMultiple.length-1)){
       predictions(i) = this.predict(featuresMultiple(i))
-      //println("Prediction: %d | %d | %f".format(predictions(i), this.labels(i), posterior(featuresMultiple(i))))
     }
     return predictions
   }
@@ -79,7 +68,6 @@ class LogistiqueRegression {
         logLikelihoodVal += Math.log(posterior(this.featuresMultiple(i)))
       }
     }
-
     return logLikelihoodVal
   }
 
@@ -93,27 +81,22 @@ class LogistiqueRegression {
   }
 
   def gradient(): Array[Double] = {
-    val gradient = Array.ofDim[Double](coefficients.length)
+    val gradient = Array.ofDim[Double](coefficients.length+1)
     for(i <- 0 to featuresMultiple.length-1){
       val posteriorVal = posterior(this.featuresMultiple(i))
+      gradient(0) += (this.labelsDouble(i) - posteriorVal)
       for(j <- 0 to coefficients.length-1){
-        gradient(j) += (this.labelsDouble(i) - posteriorVal) * this.featuresMultiple(i)(j)
+        gradient(j+1) += (this.labelsDouble(i) - posteriorVal) * this.featuresMultiple(i)(j)
       }
     }
-
     return gradient
   }
 
   def updateCoefficients() = {
-    val current_gradient = gradient()
-    /*
-    println(">>>> Gradient %d".format(k+1))
-    for(i <- 0 to current_gradient.length-1){
-      println("%f".format(current_gradient(i)))
-    }
-    */
+    val full_gradient = gradient()
+    this.intercept -= full_gradient(0) * this.alpha
     for(i <- 0 to this.coefficients.length-1){
-      this.coefficients(i) -= current_gradient(i) * this.alpha
+      this.coefficients(i) -= full_gradient(i+1) * this.alpha
     }
   }
 }
